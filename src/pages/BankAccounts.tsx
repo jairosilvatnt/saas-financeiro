@@ -6,18 +6,17 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-  CardDescription,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Landmark, ExternalLink } from 'lucide-react'
+import { Plus, Landmark, Copy, Wallet } from 'lucide-react'
 import { formatCurrency } from '@/lib/formatters'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -44,11 +43,21 @@ export default function BankAccounts() {
     setNewAccount({ name: '', provider: '', balance: '' })
   }
 
+  const getBankGradient = (provider: string) => {
+    const p = provider.toLowerCase()
+    if (p.includes('nubank')) return 'from-purple-800 to-purple-600 text-white'
+    if (p.includes('itaú') || p.includes('itau'))
+      return 'from-orange-600 to-orange-500 text-white'
+    if (p.includes('bradesco')) return 'from-red-600 to-red-500 text-white'
+    if (p.includes('inter')) return 'from-orange-500 to-yellow-500 text-white'
+    return 'from-slate-900 to-slate-700 text-white'
+  }
+
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
+    <div className="space-y-6 animate-slide-up">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight">
             Contas Bancárias
           </h2>
           <p className="text-muted-foreground text-sm">
@@ -57,7 +66,7 @@ export default function BankAccounts() {
         </div>
         <Button
           onClick={() => setIsAddOpen(true)}
-          className="gap-2 bg-slate-900"
+          className="gap-2 rounded-full shadow-lg shadow-primary/20"
         >
           <Plus className="h-4 w-4" />
           Adicionar
@@ -66,90 +75,97 @@ export default function BankAccounts() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {bankAccounts.map((acc) => (
-          <Card
+          <div
             key={acc.id}
-            className="border-slate-200 shadow-md bg-gradient-to-br from-white to-slate-50"
+            className={`group relative h-56 rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-transform hover:-translate-y-1 bg-gradient-to-br ${getBankGradient(acc.provider)}`}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-                  <Landmark className="h-5 w-5 text-slate-600" />
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-2">
+                <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl">
+                  <Landmark className="h-5 w-5 text-white" />
                 </div>
-                <div>
-                  <CardTitle className="text-base font-semibold">
-                    {acc.provider}
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    {acc.name}
-                  </CardDescription>
-                </div>
+                <span className="font-semibold tracking-wide">
+                  {acc.provider}
+                </span>
               </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="text-2xl font-bold font-mono text-slate-900 tracking-tight">
+              <div className="text-white/80 font-mono text-sm">
+                {acc.number || '**** 8829'}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-xs uppercase tracking-widest text-white/60">
+                Saldo Atual
+              </span>
+              <div className="text-3xl font-bold tracking-tight font-mono text-white">
                 {formatCurrency(acc.balance)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Conta: {acc.number || '****'}
-              </p>
-            </CardContent>
-            <CardFooter className="bg-slate-50/50 border-t p-3">
+            </div>
+
+            <div className="flex justify-between items-center pt-4 border-t border-white/10">
+              <span className="text-sm font-medium text-white/90">
+                {acc.name}
+              </span>
               <Button
+                size="icon"
                 variant="ghost"
-                size="sm"
-                className="w-full text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                className="h-8 w-8 text-white hover:bg-white/20 rounded-full"
               >
-                <ExternalLink className="h-3 w-3 mr-2" />
-                Simular Open Finance
+                <Copy className="h-4 w-4" />
               </Button>
-            </CardFooter>
-          </Card>
+            </div>
+
+            {/* Shine effect */}
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/10 to-transparent rounded-3xl pointer-events-none" />
+          </div>
         ))}
 
         {bankAccounts.length === 0 && (
-          <div className="col-span-full flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg border-slate-200 bg-slate-50/50">
-            <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-              <Landmark className="h-6 w-6 text-slate-400" />
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-border/50 rounded-3xl bg-muted/10">
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Wallet className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="font-medium text-slate-900">
-              Nenhuma conta bancária
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4 max-w-sm">
+            <h3 className="text-lg font-semibold">Nenhuma conta conectada</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               Adicione sua primeira conta para começar a controlar seu saldo
-              consolidado.
+              consolidado em um só lugar.
             </p>
-            <Button onClick={() => setIsAddOpen(true)}>Adicionar Conta</Button>
+            <Button onClick={() => setIsAddOpen(true)} className="rounded-full">
+              Adicionar Conta
+            </Button>
           </div>
         )}
       </div>
 
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-3xl sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Adicionar Conta Bancária</DialogTitle>
+            <DialogTitle>Nova Conta</DialogTitle>
             <DialogDescription>
-              Insira os dados da sua nova conta.
+              Insira os detalhes da instituição financeira.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>Nome da Conta (Apelido)</Label>
+              <Label>Apelido da Conta</Label>
               <Input
                 value={newAccount.name}
                 onChange={(e) =>
                   setNewAccount({ ...newAccount, name: e.target.value })
                 }
-                placeholder="Ex: Conta Principal"
+                placeholder="Ex: Reserva de Emergência"
+                className="rounded-xl"
               />
             </div>
             <div className="grid gap-2">
-              <Label>Instituição</Label>
+              <Label>Banco / Instituição</Label>
               <Input
                 value={newAccount.provider}
                 onChange={(e) =>
                   setNewAccount({ ...newAccount, provider: e.target.value })
                 }
-                placeholder="Ex: Nubank, Itaú"
+                placeholder="Ex: Nubank"
+                className="rounded-xl"
               />
             </div>
             <div className="grid gap-2">
@@ -161,11 +177,14 @@ export default function BankAccounts() {
                   setNewAccount({ ...newAccount, balance: e.target.value })
                 }
                 placeholder="0.00"
+                className="rounded-xl"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleAdd}>Salvar Conta</Button>
+            <Button onClick={handleAdd} className="w-full rounded-xl">
+              Salvar Conta
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

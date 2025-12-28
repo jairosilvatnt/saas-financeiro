@@ -21,6 +21,7 @@ import { useApp } from '@/context/AppContext'
 import { useToast } from '@/hooks/use-toast'
 import { TransactionType, Category } from '@/context/AppContext'
 import { cn } from '@/lib/utils'
+import { CalendarIcon, Check, DollarSign } from 'lucide-react'
 
 interface AddTransactionModalProps {
   isOpen: boolean
@@ -46,7 +47,7 @@ export function AddTransactionModal({
 
     if (!description || !amount || !sourceId) {
       toast({
-        title: 'Erro',
+        title: 'Campos incompletos',
         description: 'Por favor preencha todos os campos obrigatórios.',
         variant: 'destructive',
       })
@@ -66,8 +67,10 @@ export function AddTransactionModal({
     })
 
     toast({
-      title: 'Sucesso',
-      description: 'Transação adicionada com sucesso!',
+      title: 'Transação Adicionada',
+      description: 'Seu lançamento foi registrado com sucesso.',
+      className:
+        'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/50 dark:border-emerald-800 dark:text-emerald-200',
     })
 
     // Reset and Close
@@ -101,131 +104,171 @@ export function AddTransactionModal({
       lower.includes('cinema')
     ) {
       setCategory('Entertainment')
+    } else if (
+      lower.includes('luz') ||
+      lower.includes('agua') ||
+      lower.includes('internet')
+    ) {
+      setCategory('Utilities')
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Nova Transação</DialogTitle>
+      <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden gap-0 border-border/40 shadow-2xl">
+        <DialogHeader className="p-6 pb-2 bg-muted/30 border-b border-border/40">
+          <DialogTitle className="text-xl font-bold tracking-tight">
+            Nova Transação
+          </DialogTitle>
           <DialogDescription>
-            Adicione uma receita ou despesa.
+            Registre uma entrada ou saída financeira.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="type" className="text-right">
-              Tipo
-            </Label>
-            <div className="col-span-3 flex gap-2">
-              <Button
-                type="button"
-                variant={type === 'expense' ? 'destructive' : 'outline'}
-                className="flex-1"
-                onClick={() => setType('expense')}
-              >
-                Despesa
-              </Button>
-              <Button
-                type="button"
-                variant={type === 'income' ? 'default' : 'outline'}
-                className={cn(
-                  'flex-1',
-                  type === 'income' && 'bg-emerald-600 hover:bg-emerald-700',
-                )}
-                onClick={() => setType('income')}
-              >
-                Receita
-              </Button>
-            </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Type Selection */}
+          <div className="flex p-1 bg-muted rounded-xl">
+            <button
+              type="button"
+              onClick={() => setType('expense')}
+              className={cn(
+                'flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                type === 'expense'
+                  ? 'bg-background shadow-sm text-rose-600 dark:text-rose-400'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              Despesa
+            </button>
+            <button
+              type="button"
+              onClick={() => setType('income')}
+              className={cn(
+                'flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                type === 'income'
+                  ? 'bg-background shadow-sm text-emerald-600 dark:text-emerald-400'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              Receita
+            </button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="amount" className="text-right">
-              Valor
-            </Label>
-            <div className="col-span-3 relative">
-              <span className="absolute left-3 top-2.5 text-muted-foreground text-sm">
-                R$
-              </span>
+
+          <div className="space-y-4">
+            <div className="relative">
+              <Label
+                htmlFor="amount"
+                className="text-xs uppercase font-semibold text-muted-foreground mb-1.5 block"
+              >
+                Valor
+              </Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  className="pl-10 h-11 rounded-xl bg-muted/20 border-border/60 text-lg font-semibold"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0,00"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="description"
+                className="text-xs uppercase font-semibold text-muted-foreground mb-1.5 block"
+              >
+                Descrição
+              </Label>
               <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                className="pl-9"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0,00"
+                id="description"
+                className="h-11 rounded-xl bg-muted/20 border-border/60"
+                value={description}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
+                placeholder="Ex: Almoço, Uber, Salário"
               />
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label
+                  htmlFor="category"
+                  className="text-xs uppercase font-semibold text-muted-foreground mb-1.5 block"
+                >
+                  Categoria
+                </Label>
+                <Select
+                  value={category}
+                  onValueChange={(v) => setCategory(v as Category)}
+                >
+                  <SelectTrigger className="h-11 rounded-xl bg-muted/20 border-border/60">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border/40 shadow-xl">
+                    <SelectItem value="Food">Alimentação</SelectItem>
+                    <SelectItem value="Transport">Transporte</SelectItem>
+                    <SelectItem value="Utilities">Contas</SelectItem>
+                    <SelectItem value="Entertainment">Lazer</SelectItem>
+                    <SelectItem value="Health">Saúde</SelectItem>
+                    <SelectItem value="Salary">Salário</SelectItem>
+                    <SelectItem value="Shopping">Compras</SelectItem>
+                    <SelectItem value="Other">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label
+                  htmlFor="date"
+                  className="text-xs uppercase font-semibold text-muted-foreground mb-1.5 block"
+                >
+                  Data
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="date"
+                    type="date"
+                    className="h-11 rounded-xl bg-muted/20 border-border/60 pl-3 text-sm"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label
+                htmlFor="source"
+                className="text-xs uppercase font-semibold text-muted-foreground mb-1.5 block"
+              >
+                Conta de Origem
+              </Label>
+              <Select value={sourceId} onValueChange={setSourceId}>
+                <SelectTrigger className="h-11 rounded-xl bg-muted/20 border-border/60">
+                  <SelectValue placeholder="Selecione a conta" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border/40 shadow-xl">
+                  {accounts.map((acc) => (
+                    <SelectItem key={acc.id} value={acc.id}>
+                      <span className="font-medium">{acc.name}</span>{' '}
+                      <span className="text-muted-foreground text-xs">
+                        ({acc.provider})
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Descrição
-            </Label>
-            <Input
-              id="description"
-              className="col-span-3"
-              value={description}
-              onChange={(e) => handleDescriptionChange(e.target.value)}
-              placeholder="Ex: Almoço, Salário"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="category" className="text-right">
-              Categoria
-            </Label>
-            <Select
-              value={category}
-              onValueChange={(v) => setCategory(v as Category)}
+
+          <DialogFooter className="pt-2">
+            <Button
+              type="submit"
+              className="w-full h-11 rounded-xl text-base font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
             >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Food">Alimentação</SelectItem>
-                <SelectItem value="Transport">Transporte</SelectItem>
-                <SelectItem value="Utilities">Contas</SelectItem>
-                <SelectItem value="Entertainment">Lazer</SelectItem>
-                <SelectItem value="Health">Saúde</SelectItem>
-                <SelectItem value="Salary">Salário</SelectItem>
-                <SelectItem value="Shopping">Compras</SelectItem>
-                <SelectItem value="Other">Outros</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="source" className="text-right">
-              Conta
-            </Label>
-            <Select value={sourceId} onValueChange={setSourceId}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Selecione a conta" />
-              </SelectTrigger>
-              <SelectContent>
-                {accounts.map((acc) => (
-                  <SelectItem key={acc.id} value={acc.id}>
-                    {acc.name} ({acc.provider})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
-              Data
-            </Label>
-            <Input
-              id="date"
-              type="date"
-              className="col-span-3"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-          <DialogFooter>
-            <Button type="submit" className="w-full sm:w-auto">
-              Salvar Transação
+              Confirmar Transação
             </Button>
           </DialogFooter>
         </form>

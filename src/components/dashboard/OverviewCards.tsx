@@ -1,12 +1,12 @@
 import { useApp } from '@/context/AppContext'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { formatCurrency } from '@/lib/formatters'
 import {
-  ArrowUpRight,
-  ArrowDownRight,
+  TrendingUp,
   Wallet,
   CreditCard,
   PiggyBank,
+  MoreHorizontal,
 } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
@@ -29,69 +29,118 @@ export function OverviewCards() {
 
   const items = [
     {
-      title: 'Saldo Consolidado',
+      title: 'Saldo Total',
       value: totalBalance,
       icon: Wallet,
-      color: 'text-emerald-600',
-      sub: '+12% vs mês passado',
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-500/10',
+      trend: '+12%',
+      trendUp: true,
     },
     {
-      title: 'Em Conta Corrente',
+      title: 'Conta Corrente',
       value: bankBalance,
       icon: PiggyBank,
-      color: 'text-blue-600',
-      sub: 'Disponível para saque',
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-500/10',
+      trend: '+5%',
+      trendUp: true,
     },
     {
       title: 'Benefícios',
       value: benefitBalance,
       icon: CreditCard,
-      color: 'text-amber-600',
-      sub: 'Alimentação e Refeição',
+      color: 'text-amber-500',
+      bg: 'bg-amber-500/10',
+      trend: '-2%',
+      trendUp: false,
     },
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
       {items.map((item, i) => (
         <Card
           key={i}
-          className="shadow-subtle border-slate-100 hover:shadow-md transition-shadow"
+          className="group relative overflow-hidden border-border/40 shadow-sm hover:shadow-md transition-all duration-300 glass-card rounded-3xl"
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {item.title}
-            </CardTitle>
-            <item.icon className={cn('h-4 w-4', item.color)} />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold font-mono tracking-tight text-slate-900">
-              {formatCurrency(item.value)}
+          <CardContent className="p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div
+                className={cn(
+                  'p-3 rounded-2xl transition-colors duration-300',
+                  item.bg,
+                  item.color,
+                )}
+              >
+                <item.icon className="h-6 w-6" />
+              </div>
+              <button className="text-muted-foreground hover:text-foreground transition-colors">
+                <MoreHorizontal className="h-5 w-5" />
+              </button>
             </div>
-            <p className="text-xs text-muted-foreground mt-1 flex items-center">
-              {i === 0 ? (
-                <ArrowUpRight className="h-3 w-3 text-emerald-500 mr-1" />
-              ) : null}
-              {item.sub}
-            </p>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                {item.title}
+              </p>
+              <h3 className="text-2xl font-bold tracking-tight text-foreground font-display">
+                {formatCurrency(item.value)}
+              </h3>
+              <div className="flex items-center gap-2 mt-2">
+                <span
+                  className={cn(
+                    'text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1',
+                    item.trendUp
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                      : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400',
+                  )}
+                >
+                  <TrendingUp
+                    className={cn(
+                      'h-3 w-3',
+                      !item.trendUp && 'rotate-180 transform',
+                    )}
+                  />
+                  {item.trend}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  vs mês anterior
+                </span>
+              </div>
+            </div>
           </CardContent>
+          <div
+            className={cn(
+              'absolute bottom-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-current to-transparent',
+              item.color,
+            )}
+          />
         </Card>
       ))}
-      <Card className="shadow-subtle border-slate-100">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Meta de Gastos
-          </CardTitle>
-          <ArrowDownRight className="h-4 w-4 text-rose-500" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold font-mono tracking-tight text-slate-900">
-            64%
+
+      <Card className="glass-card border-border/40 shadow-sm rounded-3xl flex flex-col justify-between">
+        <CardContent className="p-6 h-full flex flex-col justify-between">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Meta Mensal
+              </p>
+              <h3 className="text-xl font-bold text-foreground mt-1">
+                64% Utilizado
+              </h3>
+            </div>
+            <div className="p-2 bg-primary/5 rounded-xl">
+              <TrendingUp className="h-5 w-5 text-primary" />
+            </div>
           </div>
-          <Progress value={64} className="h-2 mt-2" />
-          <p className="text-xs text-muted-foreground mt-2">
-            R$ {currentSpend} de R$ {monthlyLimit}
-          </p>
+
+          <div className="space-y-2 mt-4">
+            <Progress value={64} className="h-3 rounded-full" />
+            <div className="flex justify-between text-xs text-muted-foreground font-medium">
+              <span>{formatCurrency(currentSpend)}</span>
+              <span>{formatCurrency(monthlyLimit)}</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

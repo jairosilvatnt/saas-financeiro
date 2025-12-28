@@ -1,12 +1,9 @@
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   XAxis,
   LabelList,
-  Cell,
   Pie,
   PieChart,
 } from 'recharts'
@@ -53,21 +50,25 @@ export function DashboardCharts() {
     { month: 'Jun', income: 8500, expense: 2200 },
   ]
 
-  // Calculate category spending from actual context transactions would be ideal, but using mock for consistent chart look
+  // Mock spending
   const spendingData = [
-    { category: 'Alimentação', amount: 1250, fill: 'var(--color-food)' },
-    { category: 'Transporte', amount: 450, fill: 'var(--color-transport)' },
-    { category: 'Contas', amount: 850, fill: 'var(--color-utilities)' },
-    { category: 'Outros', amount: 320, fill: 'var(--color-other)' },
+    { category: 'food', amount: 1250, fill: 'var(--color-food)' },
+    {
+      category: 'transport',
+      amount: 450,
+      fill: 'var(--color-transport)',
+    },
+    { category: 'utilities', amount: 850, fill: 'var(--color-utilities)' },
+    { category: 'other', amount: 320, fill: 'var(--color-other)' },
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-8">
-      <Card className="col-span-4 shadow-sm border-slate-100">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mb-8">
+      <Card className="col-span-4 shadow-sm border-border/40 glass-card rounded-3xl">
         <CardHeader>
-          <CardTitle>Fluxo de Caixa</CardTitle>
+          <CardTitle className="text-lg">Fluxo de Caixa</CardTitle>
           <CardDescription>
-            Receitas vs Despesas (Últimos 6 meses)
+            Comparativo semestral de entradas e saídas.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,32 +77,40 @@ export function DashboardCharts() {
               accessibilityLayer
               data={cashFlowData}
               margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+              barGap={8}
             >
               <CartesianGrid
                 vertical={false}
                 strokeDasharray="3 3"
-                stroke="#e5e7eb"
+                stroke="currentColor"
+                className="text-border/30"
               />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                tickFormatter={(value) => value.slice(0, 3)}
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
               />
               <ChartTooltip
-                content={<ChartTooltipContent indicator="dashed" />}
+                cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+                content={
+                  <ChartTooltipContent
+                    indicator="dot"
+                    className="bg-background/90 backdrop-blur border-border/50 shadow-xl rounded-xl"
+                  />
+                }
               />
               <Bar
                 dataKey="income"
                 fill="var(--color-income)"
-                radius={4}
+                radius={[6, 6, 0, 0]}
                 name="Receitas"
               />
               <Bar
                 dataKey="expense"
                 fill="var(--color-expense)"
-                radius={4}
+                radius={[6, 6, 0, 0]}
                 name="Despesas"
               />
             </BarChart>
@@ -109,24 +118,33 @@ export function DashboardCharts() {
         </CardContent>
       </Card>
 
-      <Card className="col-span-3 shadow-sm border-slate-100">
+      <Card className="col-span-3 shadow-sm border-border/40 glass-card rounded-3xl">
         <CardHeader>
-          <CardTitle>Gastos por Categoria</CardTitle>
-          <CardDescription>Onde você gastou mais este mês</CardDescription>
+          <CardTitle className="text-lg">Gastos por Categoria</CardTitle>
+          <CardDescription>Distribuição das despesas do mês.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center items-center">
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[300px]"
+            className="mx-auto aspect-square max-h-[300px] w-full"
           >
             <PieChart>
-              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    className="bg-background/90 backdrop-blur border-border/50 shadow-xl rounded-xl"
+                  />
+                }
+              />
               <Pie
                 data={spendingData}
                 dataKey="amount"
                 nameKey="category"
-                innerRadius={60}
-                strokeWidth={5}
+                innerRadius={65}
+                outerRadius={100}
+                paddingAngle={5}
+                strokeWidth={0}
               >
                 <LabelList
                   dataKey="category"

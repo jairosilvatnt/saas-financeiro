@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 
 // Types
 export type TransactionType = 'income' | 'expense'
@@ -142,15 +142,65 @@ const INITIAL_TRANSACTIONS: Transaction[] = [
     sourceId: '1',
     sourceName: 'Nubank',
   },
+  {
+    id: '6',
+    description: 'Conta de Luz',
+    amount: 120.0,
+    date: '2024-05-10',
+    type: 'expense',
+    category: 'Utilities',
+    sourceId: '1',
+    sourceName: 'Nubank',
+  },
+  {
+    id: '7',
+    description: 'Cinema + Pipoca',
+    amount: 85.0,
+    date: '2024-05-12',
+    type: 'expense',
+    category: 'Entertainment',
+    sourceId: '1',
+    sourceName: 'Nubank',
+  },
+  {
+    id: '8',
+    description: 'Farmácia',
+    amount: 45.5,
+    date: '2024-05-13',
+    type: 'expense',
+    category: 'Health',
+    sourceId: '1',
+    sourceName: 'Nubank',
+  },
+  {
+    id: '9',
+    description: 'Freelance Design',
+    amount: 1200.0,
+    date: '2024-05-15',
+    type: 'income',
+    category: 'Salary',
+    sourceId: '2',
+    sourceName: 'Itaú',
+  },
+  {
+    id: '10',
+    description: 'Café da Tarde',
+    amount: 15.0,
+    date: '2024-05-16',
+    type: 'expense',
+    category: 'Food',
+    sourceId: '3',
+    sourceName: 'Sodexo',
+  },
 ]
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState({
+  const [user] = useState({
     name: 'Alex Silva',
     email: 'alex@example.com',
-    plan: 'Free' as const,
+    plan: 'Pro' as const,
   })
   const [accounts, setAccounts] = useState<Account[]>(INITIAL_ACCOUNTS)
   const [transactions, setTransactions] =

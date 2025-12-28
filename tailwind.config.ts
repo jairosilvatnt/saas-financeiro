@@ -95,9 +95,24 @@ export default {
         subtle:
           '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
         elevation: '0 4px 20px rgba(0, 0, 0, 0.05)',
+        glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
       },
       transitionTimingFunction: {
         apple: 'cubic-bezier(0.42, 0, 0.58, 1)',
+      },
+      animation: {
+        'fade-in': 'fade-in 0.5s ease-out',
+        'slide-up': 'slide-up 0.5s ease-out',
+      },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'slide-up': {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
       },
     },
   },
